@@ -13,13 +13,14 @@
 
 body {
     margin: 0;
-    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    background-color: var(--bg-color);
-    color: white;
-    display: flex;
-    flex-direction: column;
+    padding: 0;
+    width: 100%;
     min-height: 100vh;
-    overflow-x: hidden;
+    background-image: url('tu-fondo.jpg'); /* Pon tu ruta */
+    background-attachment: fixed; /* El fondo no se mueve al hacer scroll */
+    background-size: cover;      /* Cubre toda la pantalla siempre */
+    background-position: center;
+    overflow-x: hidden;          /* Evita que la pantalla baile hacia los lados */
 }
 
 /* =========================================
@@ -669,36 +670,19 @@ footer span { color: var(--gold); font-weight: bold; }
 
 /* --- AJUSTES PARA MÓVIL --- */
 @media (max-width: 600px) {
-    /* ... (lo que ya tenías de header y controles) ... */
-
-    /* Reducimos el tamaño de la carta para que quepa en el giro */
-    :root {
-        --card-width: 150px;  /* Más pequeña en móvil */
-        --card-height: 209px;
-    }
-
-    /* Ajustamos el contenedor de sobres para que no corte la animación */
     #pack-container {
-        perspective: 800px;
-        min-height: 300px;
+        width: 100vw;       /* Ocupa todo el ancho del móvil */
+        height: 60vh;       /* Altura proporcional a la pantalla */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        perspective: 1000px;
+        overflow: hidden;    /* Para que las cartas no se salgan por los lados */
     }
 
-    /* Corregimos el desplazamiento lateral de las cartas reveladas */
-    .card.revealed:nth-child(1) { transform: translate(-70px, 10px) rotate(-5deg); }
-    .card.revealed:nth-child(2) { transform: translate(-35px, 0px) rotate(-2deg); }
-    .card.revealed:nth-child(3) { transform: translate(0px, -5px); }
-    .card.revealed:nth-child(4) { transform: translate(35px, 0px) rotate(2deg); }
-    .card.revealed:nth-child(5) { transform: translate(70px, 10px) rotate(5deg); }
-
-    /* Aseguramos que la imagen de fondo no se repita ni se rompa */
-    .card-front, .card-back {
-        background-size: contain !important; /* Para que la carta no se corte */
-        background-repeat: no-repeat;
-        background-position: center;
-    }
-
-    /* Si tienes una carta legendaria (Hit), que no tape todo el móvil */
-    .hit-legendary:not(.aside) {
-        transform: scale(1.3) !important; /* Menos zoom que en PC */
+    /* Reducimos las cartas para que no fuercen el ancho del móvil */
+    .card {
+        width: 140px; 
+        height: 195px;
     }
 }
