@@ -13,14 +13,13 @@
 
 body {
     margin: 0;
-    padding: 0;
-    width: 100%;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-color);
+    color: white;
+    display: flex;
+    flex-direction: column;
     min-height: 100vh;
-    background-image: url('tu-fondo.jpg'); /* Pon tu ruta */
-    background-attachment: fixed; /* El fondo no se mueve al hacer scroll */
-    background-size: cover;      /* Cubre toda la pantalla siempre */
-    background-position: center;
-    overflow-x: hidden;          /* Evita que la pantalla baile hacia los lados */
+    overflow-x: hidden;
 }
 
 /* =========================================
@@ -666,23 +665,4 @@ footer span { color: var(--gold); font-weight: bold; }
 .card.aside {
     visibility: visible !important;
     opacity: 1 !important;
-}
-
-/* --- AJUSTES PARA MÓVIL --- */
-@media (max-width: 600px) {
-    #pack-container {
-        width: 100vw;       /* Ocupa todo el ancho del móvil */
-        height: 60vh;       /* Altura proporcional a la pantalla */
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        perspective: 1000px;
-        overflow: hidden;    /* Para que las cartas no se salgan por los lados */
-    }
-
-    /* Reducimos las cartas para que no fuercen el ancho del móvil */
-    .card {
-        width: 140px; 
-        height: 195px;
-    }
 }
