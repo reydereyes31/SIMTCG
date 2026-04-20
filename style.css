@@ -666,3 +666,46 @@ footer span { color: var(--gold); font-weight: bold; }
     visibility: visible !important;
     opacity: 1 !important;
 }
+
+/* --- AJUSTES PARA MÓVIL --- */
+@media (max-width: 600px) {
+    header {
+        flex-direction: column; /* Ponemos el título arriba y controles abajo */
+        padding: 10px;
+        gap: 15px;
+    }
+
+    .controls {
+        flex-direction: column; /* Botones y selectores uno encima de otro */
+        width: 100%;
+        gap: 10px;
+    }
+
+    #set-selector, #open-button, #view-album-btn {
+        width: 100%; /* Que ocupen todo el ancho del móvil */
+        font-size: 14px;
+        padding: 12px; /* Más fáciles de tocar con el dedo */
+    }
+
+    .header-main h1 {
+        font-size: 1.5rem;
+        text-align: center;
+    }
+
+    /* Ajuste del álbum para que las cartas no sean gigantes */
+    #album-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 10px;
+        padding: 10px;
+    }
+
+    /* Ajuste de la zona de filtros del álbum */
+    .album-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    #album-search {
+        width: 100% !important;
+    }
+}
