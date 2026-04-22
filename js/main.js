@@ -406,6 +406,61 @@ function renderAlbum() {
             document.getElementById('nf-show').onchange  = () => renderAlbum();
         }
 
+        // Botón "Vender todos los duplicados" — se actualiza cada render
+        let sellAllBtn = document.getElementById('sell-all-dupes-btn');
+        if (!sellAllBtn) {
+            sellAllBtn = document.createElement('button');
+            sellAllBtn.id = 'sell-all-dupes-btn';
+            sellAllBtn.style.cssText = `
+                width: 100%; padding: 10px; margin-bottom: 14px;
+                background: #c0392b; color: white; border: none;
+                border-radius: 8px; font-weight: bold; font-size: 0.9rem;
+                cursor: pointer; text-transform: uppercase; display: none;
+            `;
+            const filtersEl = document.getElementById('normal-filters');
+            filtersEl.insertAdjacentElement('afterend', sellAllBtn);
+        }
+
+        // Calcular duplicados del set actual para mostrar el total en el botón
+        {
+            const allCardsForBtn = Array.isArray(currentSetData)
+                ? currentSetData : (currentSetData.data || []);
+            const inv = getInventoryData().owned_cards;
+            let totalDupes = 0;
+            let totalValue = 0;
+            allCardsForBtn.forEach(card => {
+                const it = inv[card.id];
+                if (it && it.quantity >= 2) {
+                    const extras = it.quantity - 1;
+                    totalDupes += extras;
+                    totalValue += extras * (it.lastPrice || 0);
+                }
+            });
+
+            if (totalDupes > 0) {
+                sellAllBtn.style.display = 'block';
+                sellAllBtn.innerText = `🗑 Vender ${totalDupes} duplicado${totalDupes > 1 ? 's' : ''} del set (+$${totalValue.toFixed(2)})`;
+                sellAllBtn.onclick = () => {
+                    if (!confirm(`¿Vender ${totalDupes} cartas duplicadas del set por $${totalValue.toFixed(2)} en total?\n\nSe conservará 1 copia de cada carta.`)) return;
+                    const freshInv = getInventoryData();
+                    allCardsForBtn.forEach(card => {
+                        const entry = freshInv.owned_cards[card.id];
+                        if (entry && entry.quantity >= 2) {
+                            const extras = entry.quantity - 1;
+                            freshInv.wallet += extras * (entry.lastPrice || 0);
+                            entry.quantity = 1;
+                        }
+                    });
+                    saveInventoryData(freshInv);
+                    refreshUI();
+                    renderAlbum();
+                    showToast(`💰 Vendidos ${totalDupes} duplicados por $${totalValue.toFixed(2)}`, 'gold', 4000);
+                };
+            } else {
+                sellAllBtn.style.display = 'none';
+            }
+        }
+
         const sortMode = document.getElementById('nf-sort')?.value || 'number';
         const showMode = document.getElementById('nf-show')?.value || 'all';
 
@@ -2197,7 +2252,7 @@ window.handleAuctionPSA = function(index) {
                     height:100%; width:100%;
                     background: linear-gradient(90deg, ${accentColor}, #ffcb05);
                     border-radius:20px;
-                    transition: width 1s linear;
+                    transition: width 8s linear;
                 "></div>
             </div>
 
@@ -2214,6 +2269,14 @@ window.handleAuctionPSA = function(index) {
                 padding:8px 12px; background:#111;
                 text-align:left; line-height:1.6;
             ">Esperando pujadores...</div>
+
+            <!-- Botón omitir -->
+            <button id="auction-skip-btn" style="
+                margin-top:14px; width:100%; padding:10px;
+                background:transparent; color:#666;
+                border:1px solid #444; border-radius:8px;
+                font-size:0.85rem; cursor:pointer;
+            ">⏭ Omitir animación</button>
         </div>
     `;
 
@@ -2247,12 +2310,10 @@ window.handleAuctionPSA = function(index) {
         secondsLeft--;
         if (countdownEl) countdownEl.innerText = secondsLeft;
 
-        // Mostrar mensaje de puja según el segundo
         const msgIndex = DURATION - 1 - secondsLeft;
         if (msgIndex >= 0 && msgIndex < bidMessages.length) {
             if (bidsEl) bidsEl.innerHTML = bidMessages.slice(0, msgIndex + 1)
                 .map(m => `<div>${m}</div>`).join('');
-            // Scroll al último mensaje
             if (bidsEl) bidsEl.scrollTop = bidsEl.scrollHeight;
         }
 
@@ -2261,6 +2322,15 @@ window.handleAuctionPSA = function(index) {
             finishAuction();
         }
     }, 1000);
+
+    // Botón omitir: salta directamente al resultado
+    const skipBtn = document.getElementById('auction-skip-btn');
+    if (skipBtn) {
+        skipBtn.onclick = () => {
+            clearInterval(interval); // para el contador
+            finishAuction();         // muestra resultado inmediatamente
+        };
+    }
 
     function finishAuction() {
         // Cobrar al jugador
